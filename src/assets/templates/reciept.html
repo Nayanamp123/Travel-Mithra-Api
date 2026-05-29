@@ -1,9 +1,8 @@
-<!doctype html>
 
+<!doctype html>
 <html>
 
 <head>
-
 <meta charset="UTF-8" />
 
 <title>
@@ -12,13 +11,18 @@ Receipt {{receiptNo}}
 
 <style>
 
+@page{
+  size:A4 landscape;
+  margin:8mm;
+}
+
 *{
   box-sizing:border-box;
 }
 
 body{
   margin:0;
-  padding:20px;
+  padding:0;
   background:#fff;
   color:#000;
   font-family:Arial, Helvetica, sans-serif;
@@ -26,81 +30,83 @@ body{
 
 .receipt{
   width:100%;
-  max-width:1400px;
-  margin:0 auto;
   border:3px solid #000;
-  padding:32px;
+  padding:20px;
 }
 
 .header{
   display:grid;
-  grid-template-columns:1fr 1.2fr;
-  gap:48px;
+  grid-template-columns:42% 52%;
+  justify-content:space-between;
+  gap:25px;
   align-items:start;
 }
 
+.logo-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:130px;
+}
+
 .logo{
-  width:360px;
-  margin-top:22px;
-  display:block;
+  width:240px;
+  max-width:100%;
+}
+
+.right-section{
+  width:100%;
 }
 
 .company{
+  width:100%;
   border:1px dashed #000;
-  padding:8px;
+  padding:8px 12px;
   font-family:Georgia, serif;
+  font-size:14px;
   font-weight:700;
-  line-height:1.35;
-  font-size:17px;
+  line-height:1.4;
 }
 
 h1{
   text-align:center;
   text-decoration:underline;
-  font-size:22px;
-  margin:4px 0 10px;
-  letter-spacing:1px;
+  font-size:20px;
+  margin:8px 0 15px;
+  font-weight:700;
 }
 
 .meta{
   display:grid;
   grid-template-columns:1fr 1fr;
-  margin-top:30px;
-  border-top:1px dashed #000;
-  border-left:1px dashed #000;
+  border:1px dashed #000;
 }
 
 .meta div{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  border-right:1px dashed #000;
-  border-bottom:1px dashed #000;
-  min-height:42px;
+  grid-template-columns:auto 1fr;
   align-items:center;
+  min-height:32px;
+  padding:0 10px;
 }
 
 .meta span{
-  padding:6px;
-  font-size:16px;
+  font-size:12px;
 }
 
 .meta span:first-child{
-  text-align:right;
   font-family:Georgia, serif;
   font-style:italic;
   font-weight:700;
-}
-
-.meta span:last-child{
-  text-align:right;
-  padding-right:12px;
+  margin-right:8px;
 }
 
 .body{
   display:grid;
-  grid-template-columns:1fr 160px 1fr;
-  gap:26px;
-  margin-top:40px;
+  grid-template-columns:39% 14% 39%;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:25px;
   align-items:center;
 }
 
@@ -113,34 +119,46 @@ table{
 th,
 td{
   border:1px dashed #000;
-  padding:10px;
-  font-size:17px;
-  text-align:left;
+  padding:5px 8px;
+  font-size:12px;
+  vertical-align:middle;
 }
 
 th{
-  width:42%;
+  width:45%;
   font-family:Georgia, serif;
   font-style:italic;
   font-weight:700;
+  text-align:left;
+  line-height:1.15;
+  word-break:break-word;
+}
+
+td{
+  text-align:left;
 }
 
 .solid th,
 .solid td{
-  border-style:solid;
+  border:1px solid #000;
+}
+
+.stamp-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
 .stamp{
-  width:155px;
-  display:block;
-  margin:auto;
+  width:110px;
+  max-width:100%;
 }
 
 .note{
+  margin-top:15px;
   text-align:center;
-  font-size:18px;
-  margin-top:18px;
-  line-height:1.6;
+  font-size:11px;
+  line-height:1.5;
 }
 
 </style>
@@ -153,58 +171,37 @@ th{
 
 <div class="header">
 
+<div class="logo-wrap">
 <img
 class="logo"
 src="data:image/jpeg;base64,{{logoBase64}}"
 alt="Travel Mithra"
 />
-
-<div>
-
-<div class="company">
-
-Travel Mithra Holidays
-<br>
-
-KS3, Heavenly Plaza,
-Padamugal,
-Kakkanad,
-Cochin - 21
-
-<br>
-
-PH: 8129430111
-
 </div>
 
-<h1>
-RECEIPT
-</h1>
+<div class="right-section">
+
+<div class="company">
+Travel Mithra Holidays
+<br>
+KS3, Heavenly Plaza, Padamugal, Kakkanad,
+Cochin - 21
+<br>
+PH: 8129430111
+</div>
+
+<h1>RECEIPT</h1>
 
 <div class="meta">
 
 <div>
-
-<span>
-Date :
-</span>
-
-<span>
-{{currentDate}}
-</span>
-
+<span>Date :</span>
+<span>{{currentDate}}</span>
 </div>
 
 <div>
-
-<span>
-Receipt No :
-</span>
-
-<span>
-{{receiptNo}}
-</span>
-
+<span>Receipt No :</span>
+<span>{{receiptNo}}</span>
 </div>
 
 </div>
@@ -220,70 +217,35 @@ Receipt No :
 <tbody>
 
 <tr class="solid">
-
-<th>
-Received a sum of
-</th>
-
-<td>
-₹{{amount}}/-
-</td>
-
+<th>Received a sum of</th>
+<td>₹{{amount}}/-</td>
 </tr>
 
 <tr>
-
-<th>
-On account of
-</th>
-
-<td>
-{{destination}}
-</td>
-
+<th>On account of</th>
+<td>{{destination}}</td>
 </tr>
 
 <tr>
-
-<th>
-Payment Mode
-</th>
-
-<td>
-BANK TRANSFER
-</td>
-
+<th>Payment Mode</th>
+<td>BANK TRANSFER</td>
 </tr>
 
 <tr class="solid">
-
-<th>
-Total Closing Amount
-</th>
-
-<td>
-₹{{amount}}/-
-</td>
-
+<th>Total Closing Amount</th>
+<td>₹{{totalAmount}}/-</td>
 </tr>
 
 <tr class="solid">
-
-<th>
-Balance to pay
-</th>
-
-<td>
-₹0/-
-</td>
-
+<th>Balance to pay</th>
+<td>₹{{balanceAmount}}/-</td>
 </tr>
 
 </tbody>
 
 </table>
 
-<div>
+<div class="stamp-wrap">
 
 <img
 class="stamp"
@@ -298,63 +260,28 @@ alt="Stamp"
 <tbody>
 
 <tr>
-
-<th>
-Part payment from
-</th>
-
-<td>
-{{customerName}}
-</td>
-
+<th>Part payment from</th>
+<td>{{customerName}}</td>
 </tr>
 
 <tr>
-
-<th>
-Group of
-</th>
-
-<td>
-{{travellers}} ADULT
-</td>
-
+<th>Group of</th>
+<td>{{travellers}} ADULT</td>
 </tr>
 
 <tr>
-
-<th>
-Payment Accepted by
-</th>
-
-<td>
-SHARANYA RATHEESH
-</td>
-
+<th>Payment Accepted by</th>
+<td>SHARANYA RATHEESH</td>
 </tr>
 
 <tr class="solid">
-
-<th>
-Previous Payments
-</th>
-
-<td>
-₹{{previousPayment}}/-
-</td>
-
+<th>Previous Payments</th>
+<td>₹{{previousPayment}}/-</td>
 </tr>
 
 <tr>
-
-<th>
-Remarks if any
-</th>
-
-<td>
-
-</td>
-
+<th>Remarks if any</th>
+<td></td>
 </tr>
 
 </tbody>
@@ -364,10 +291,9 @@ Remarks if any
 </div>
 
 <div class="note">
-
 Note : This is a computer generated document hence doesn't require any signature/stamp.
+<br>
 *Terms and Conditions Apply.
-
 </div>
 
 </section>
@@ -375,3 +301,4 @@ Note : This is a computer generated document hence doesn't require any signature
 </body>
 
 </html>
+

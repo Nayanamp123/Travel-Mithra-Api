@@ -1,148 +1,174 @@
+
 import fs from "fs";
 import path from "path";
 
 import { Booking } from "../models/booking.model";
+import { Customer } from "../models/customer.model";
+
 import { generateReceiptPDFRepository } from "../repositories/receipt.repository";
 
 export const generateReceiptService = async (
   bookingId: number,
 ) => {
 
-  try {
+  const booking: any =
+    await Booking.findByPk(
+      bookingId,
+      {
+        include: [
+          {
+            model: Customer,
+            as: "customer",
+            attributes: [
+              "id",
+              "name",
+              "email",
+            ],
+          },
+        ],
+      },
+    );
 
-    const booking: any =
-      await Booking.findByPk(
-        bookingId,
+  if (!booking) {
+    throw new Error(
+      "Booking not found",
+    );
+  }
+
+  const receiptNo =
+    `TMH/${booking.id}/${new Date()
+      .toLocaleDateString("en-GB")
+      .replace(/\//g, "")}`;
+
+  const currentDate =
+    new Date()
+      .toLocaleDateString(
+        "en-GB",
       );
 
-    if (!booking) {
-      throw new Error(
-        "Booking not found",
-      );
-    }
+  const totalAmount =
+    Number(
+      booking.amount,
+    );
 
-    const receiptNo =
-      `TMH/${booking.id}/${new Date()
-        .toLocaleDateString("en-GB")
-        .replace(/\//g, "")}`;
+  const previousPayment =
+    Number(
+      booking.previous_payment ||
+      0,
+    );
 
-    const currentDate =
-      new Date()
-        .toLocaleDateString(
-          "en-GB",
-        );
+  const currentPayment =
+    Number(
+      booking.current_payment ||
+      booking.amount,
+    );
 
+  const balanceAmount =
+    totalAmount -
+    previousPayment -
+    currentPayment;
 
-
-    const logoBase64 =
-      fs.readFileSync(
-        path.join(
-          __dirname,
-          "../assets/logo.jpeg",
-        ),
-        "base64",
-      );
-
-
-
-    const stampBase64 =
-      fs.readFileSync(
-        path.join(
-          __dirname,
-          "../assets/stamp.jpeg",
-        ),
-        "base64",
-      );
-
-
-
-    const templatePath =
+  const logoBase64 =
+    fs.readFileSync(
       path.join(
         __dirname,
-        "../assets/templates/reciept.html",
-      );
+        "../assets/logo.jpeg",
+      ),
+      "base64",
+    );
 
+  const stampBase64 =
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        "../assets/stamp.jpeg",
+      ),
+      "base64",
+    );
 
+  const templatePath =
+    path.join(
+      __dirname,
+      "../assets/templates/reciept.html",
+    );
 
-    let html =
-      fs.readFileSync(
-        templatePath,
-        "utf8",
-      );
+  let html =
+    fs.readFileSync(
+      templatePath,
+      "utf8",
+    );
 
+  html = html
 
+    .replace(
+      /{{receiptNo}}/g,
+      receiptNo,
+    )
 
-    html = html
+    .replace(
+      /{{currentDate}}/g,
+      currentDate,
+    )
 
-      .replace(
-        /{{receiptNo}}/g,
-        receiptNo,
-      )
+    .replace(
+      /{{logoBase64}}/g,
+      logoBase64,
+    )
 
-      .replace(
-        /{{currentDate}}/g,
-        currentDate,
-      )
+    .replace(
+      /{{stampBase64}}/g,
+      stampBase64,
+    )
 
-      .replace(
-        /{{logoBase64}}/g,
-        logoBase64,
-      )
+    .replace(
+      /{{customerName}}/g,
+      booking.customer?.name ||
+      "",
+    )
 
-      .replace(
-        /{{stampBase64}}/g,
-        stampBase64,
-      )
+    .replace(
+      /{{destination}}/g,
+      booking.destination || "",
+    )
 
-      .replace(
-        /{{destination}}/g,
-        booking.destination,
-      )
+    .replace(
+      /{{travellers}}/g,
+      String(
+        booking.number_of_travellers || 0,
+      ),
+    )
 
-      .replace(
-        /{{amount}}/g,
-        String(
-          booking.amount,
-        ),
-      )
+    .replace(
+      /{{amount}}/g,
+      currentPayment.toLocaleString(
+        "en-IN",
+      ),
+    )
 
-      .replace(
-        /{{travellers}}/g,
-        String(
-          booking.number_of_travellers,
-        ),
-      )
+    .replace(
+      /{{totalAmount}}/g,
+      totalAmount.toLocaleString(
+        "en-IN",
+      ),
+    )
 
-      .replace(
-        /{{customerName}}/g,
-        booking.customer_name ||
-          "",
-      )
+    .replace(
+      /{{previousPayment}}/g,
+      previousPayment.toLocaleString(
+        "en-IN",
+      ),
+    )
 
-      .replace(
-        /{{previousPayment}}/g,
-        String(
-          booking.previous_payment ||
-            0,
-        ),
-      );
+    .replace(
+      /{{balanceAmount}}/g,
+      balanceAmount.toLocaleString(
+        "en-IN",
+      ),
+    );
 
-
-
-    const pdfPath =
-      await generateReceiptPDFRepository(
-        html,
-        booking.id,
-      );
-
-
-
-    return pdfPath;
-
-  } catch (error) {
-
-    console.log(error);
-
-    throw error;
-  }
+  return generateReceiptPDFRepository(
+    html,
+    booking.id,
+  );
 };
+
